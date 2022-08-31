@@ -1,22 +1,26 @@
-const dropdownValue = document.querySelector(".dropdown__value");
-const dropdownList = document.querySelector(".dropdown__list");
-dropdownValue.onclick = function () {
-    if (dropdownList.classList == 'dropdown__list dropdown__list_active') {
-        dropdownList.classList.remove('dropdown__list_active');
+const allDropDownList = document.getElementsByClassName('dropdown__value');
+const dropDownList = Array.from(allDropDownList);
+const dropDownItem = Array.from(document.getElementsByClassName('dropdown__link'));
+
+function dropDown() {
+    let clDrop = Array.from(document.getElementsByClassName('dropdown__list'));
+    if (clDrop[0].className === "dropdown__list") {
+        clDrop[0].className = "dropdown__list dropdown__list_active";
     } else {
-        dropdownList.classList.add('dropdown__list_active');
+        clDrop[0].className = "dropdown__list";
     }
+    return false;
 }
-const dropdownItem = document.body.querySelectorAll(".dropdown__item");
-for (let i = 0; i < dropdownItem.length; i++) {
-    dropdownItem[i].addEventListener("click", function (event) {
-        const er = this.closest('.dropdown__list');
-        if (er.classList[0] == 'dropdown__list') {
-            event.target.onclick = function () {
-                return false;
-            }
-            dropdownValue.textContent = event.target.textContent;
-            dropdownList.classList.remove('dropdown__list_active');
-        }
-    });
+
+function clickItem(event) {
+    let topItem = Array.from(document.getElementsByClassName('dropdown__value'));
+    topItem[0].textContent = this.textContent;
+    event.preventDefault();
+    dropDown();
+}
+
+dropDownList[0].addEventListener('click', dropDown);
+
+for (let i = 0; i < dropDownItem.length; i++) {
+    dropDownItem[i].addEventListener('click', clickItem);
 }
