@@ -1,26 +1,49 @@
-const hasTooltip = document.querySelectorAll('.has-tooltip');
+function click(e) {
+	removeTooltips(e);
 
-function setTooltipActive() {
-  const tooltipActive = document.getElementsByClassName('tooltip_active')[0]; 
-  
-  event.preventDefault(); 
-  
-  if (tooltipActive !== undefined) {
-    tooltipActive.classList.remove('tooltip_active');
-     if (tooltipActive.textContent == this.title) {
-      return false;
-    }
-  }
-  
-  const tooltip = document.createElement('div');
-  tooltip.classList.add('tooltip', 'tooltip_active');
-  tooltip.textContent = this.getAttribute('title');
-  const coordinates= this.getBoundingClientRect();
-  tooltip.style.top = coordinates.bottom + 3 + 'px';
-  tooltip.style.left = coordinates.left + 'px';
-  document.body.append(tooltip); 
+	let targetTop = e.target.offsetTop;
+
+	let left = e.target.offsetLeft - window.scrollX;
+	let top = targetTop - window.scrollY + e.target.offsetHeight;
+
+	document.getElementsByTagName("body")[0].innerHTML += `<div class="tooltip"
+      style="
+        left: ${left}px;
+        top: ${top}px;
+        display: block;
+      ">
+      ${e.target.getAttribute("title")}
+    </div>`;
+
+	let newTooltip = document.getElementsByClassName("tooltip")[0];
+
+	if (top + newTooltip.offsetHeight > window.innerHeight) {
+		top = targetTop - window.scrollY - newTooltip.offsetHeight;
+		newTooltip.style.top = `${top}px`;
+	}
+
+	addEvents();
+	e.preventDefault();
 }
 
-for (element of hasTooltip) {
-  element.addEventListener('click', setTooltipActive);
+function removeTooltips(e) {
+	if (!e.defaultPrevented) {
+    [...document.getElementsByClassName("tooltip")].forEach(el => {
+			el.remove();
+		});
+	}
 }
+
+function addEvents() {
+	const tooltipItems = document.getElementsByClassName("has-tooltip");
+  [...tooltipItems].forEach(tooltipItem => {
+		tooltipItem.addEventListener("click", click);
+	});
+	document
+		.getElementsByTagName("body")[0]
+		.addEventListener("click", removeTooltips);
+	window.addEventListener("scroll", removeTooltips);
+	window.addEventListener("resize", removeTooltips);
+}
+
+addEvents();
