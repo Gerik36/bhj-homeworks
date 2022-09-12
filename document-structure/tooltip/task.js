@@ -1,49 +1,31 @@
-function click(e) {
-	removeTooltips(e);
+  
+'use strict';
 
-	let targetTop = e.target.offsetTop;
+const tooltips = Array.from(document.querySelectorAll(".has-tooltip"));
 
-	let left = e.target.offsetLeft - window.scrollX;
-	let top = targetTop - window.scrollY + e.target.offsetHeight;
+tooltips.forEach(tooltip => {
+   const elem = document.createElement('div');
+   elem.textContent = tooltip.title;
 
-	document.getElementsByTagName("body")[0].innerHTML += `<div class="tooltip"
-      style="
-        left: ${left}px;
-        top: ${top}px;
-        display: block;
-      ">
-      ${e.target.getAttribute("title")}
-    </div>`;
+   tooltip.addEventListener("click", (e) => {
+      e.preventDefault();
+      elem.classList.add("tooltip");
+      tooltip.insertAdjacentElement('beforeBegin', elem);
+      elem.style.position = "absolute";
+      elem.style.left = `${tooltip.getBoundingClientRect().left}px`;
+      elem.style.top = `${tooltip.getBoundingClientRect().bottom}px`;
 
-	let newTooltip = document.getElementsByClassName("tooltip")[0];
+      const elems = Array.from(document.querySelectorAll(".tooltip_active"));
+      const findElem = elems.find(elem => elem.classList.contains("tooltip_active"));
 
-	if (top + newTooltip.offsetHeight > window.innerHeight) {
-		top = targetTop - window.scrollY - newTooltip.offsetHeight;
-		newTooltip.style.top = `${top}px`;
-	}
-
-	addEvents();
-	e.preventDefault();
-}
-
-function removeTooltips(e) {
-	if (!e.defaultPrevented) {
-    [...document.getElementsByClassName("tooltip")].forEach(el => {
-			el.remove();
-		});
-	}
-}
-
-function addEvents() {
-	const tooltipItems = document.getElementsByClassName("has-tooltip");
-  [...tooltipItems].forEach(tooltipItem => {
-		tooltipItem.addEventListener("click", click);
-	});
-	document
-		.getElementsByTagName("body")[0]
-		.addEventListener("click", removeTooltips);
-	window.addEventListener("scroll", removeTooltips);
-	window.addEventListener("resize", removeTooltips);
-}
-
-addEvents();
+      if (findElem === undefined) {
+         elem.classList.add("tooltip_active");
+      } else {
+         if (findElem !== elem) {
+            elem.classList.add("tooltip_active");
+         }
+         findElem.classList.remove("tooltip_active");
+      }
+   }
+   )
+})
